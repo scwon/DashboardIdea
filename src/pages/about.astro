@@ -1,5 +1,8 @@
 ---
+import "../styles/global.css";
 
+const pageTitle = "SSP";
+const skillColor = "red";
 ---
 
 <html lang="ko-KR">
@@ -8,12 +11,24 @@
     <link rel="icon" href="/SSP_favicon.ico" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <title>SSP</title>
+    <title>{pageTitle}</title>
+    <style define:vars={{ skillColor }}>
+      h1 {
+        color: purple;
+        font-size: 4rem;
+      }
+      .skill {
+        color: green;
+        color: var(--skillColor);
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body>
     <a href="/">Home</a>
     <a href="/about/">About</a>
     <a href="/blog/">Blog</a>
     <h1>으바웃미</h1>
+    <h1 class="skill">이거 스끼린데</h1>
   </body>
 </html>
