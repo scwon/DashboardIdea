@@ -12,11 +12,21 @@ class PowerGauge {
   prevTime = 0;
   standardSpeed = 1000;
   speed = 2;
+  width = 30;
+  height = 200;
+  canvas = document.createElement("canvas");
+  ctx = this.canvas.getContext("2d")!;
 
-  start = () => {
-    this.progress = true;
-  };
+  constructor() {
+    const { ctx, width, height } = this;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeRect(0.5, 0.5, this.width - 1, this.height - 1);
+    this.render();
+  }
 
+  start = () => (this.progress = true);
   process = (time: number) => {
     if (this.progress) {
       if (!this.prevTime) {
@@ -38,6 +48,16 @@ class PowerGauge {
         this.power = 0;
         this.direction = true;
       }
+      this.render();
+    }
+  };
+
+  render = () => {
+    const { width, height, ctx, power } = this;
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeRect(0.5, 0.5, this.width - 1, this.height - 1);
+    if (this.power) {
+      ctx.fillRect(0, height, width, -height * power);
     }
   };
 
@@ -46,6 +66,7 @@ class PowerGauge {
     this.power = 0;
     this.prevTime = 0;
     this.direction = true;
+    this.render();
   };
 }
 
@@ -60,11 +81,12 @@ class Navigation {
     this.canvas.style.width = "100%";
     this.canvas.style.height = "100%";
     const rect = this.canvas.getBoundingClientRect();
-    this.width = Math.round(rect.width * this.ratio);
-    this.height = Math.round(rect.height * this.ratio);
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    this.width = Math.round(rect.width * this.ratio) / this.ratio;
+    this.height = Math.round(rect.height * this.ratio) / this.ratio;
+    this.canvas.width = this.width * this.ratio;
+    this.canvas.height = this.height * this.ratio;
     this.ctx = this.canvas.getContext("2d")!;
+    this.ctx.scale(this.ratio, this.ratio);
 
     window.requestAnimationFrame(this.render);
 
@@ -85,8 +107,11 @@ class Navigation {
     const { ctx, powerGauge, width, height } = this;
     ctx.clearRect(0, 0, this.width, this.height);
     powerGauge.process(time);
-    ctx.strokeRect(width, 0, -100, height);
-    ctx.fillRect(width, height, -100, -height * powerGauge.power);
+    ctx.drawImage(
+      powerGauge.canvas,
+      width - powerGauge.width,
+      (height - powerGauge.height) / 2
+    );
     window.requestAnimationFrame(this.render);
   };
 }
