@@ -5,6 +5,47 @@ interface MenuItemInterface {
 
 const MENU = {};
 
+class Canon {
+  angle = 0;
+  maxAngle = 90;
+  minAngle = 0;
+  canvas = document.createElement("canvas");
+  ctx = this.canvas.getContext("2d")!;
+  width = 50;
+  height = 30;
+  constructor(ratio: number) {
+    this.canvas.width = this.width * ratio;
+    this.canvas.height = this.height * ratio;
+    this.ctx.scale(ratio, ratio);
+    this.render();
+  }
+
+  up = () => {
+    this.angle += 3;
+    if (this.angle > this.maxAngle) this.angle = this.maxAngle;
+  };
+
+  down = () => {
+    this.angle -= 3;
+    if (this.angle < this.minAngle) this.angle = this.minAngle;
+  };
+
+  render = () => {
+    const { ctx, width, height } = this;
+    ctx.clearRect(0, 0, width, height);
+    ctx.beginPath();
+    ctx.rect(0, 0, 10, height);
+    ctx.moveTo(10, 2);
+    ctx.lineTo(25, 2);
+    ctx.quadraticCurveTo(width, 15, 25, height - 2);
+    ctx.lineTo(10, height - 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "#222222";
+    ctx.stroke();
+  };
+}
+
 class PowerGauge {
   progress = false;
   direction = true; // true is up, false is down;
@@ -77,6 +118,7 @@ class Navigation {
   width: number;
   height: number;
   powerGauge = new PowerGauge();
+  canon = new Canon(this.ratio);
   constructor() {
     this.canvas.style.width = "100%";
     this.canvas.style.height = "100%";
@@ -96,6 +138,20 @@ class Navigation {
       }
     });
 
+    window.addEventListener(
+      "keypress",
+      (e) => {
+        if (e.key === "w") {
+          this.canon.up();
+        }
+
+        if (e.key === "s") {
+          this.canon.down();
+        }
+      },
+      false
+    );
+
     window.addEventListener("keyup", (e) => {
       if (e.key === " ") {
         this.powerGauge.end();
@@ -104,7 +160,7 @@ class Navigation {
   }
 
   render = (time: number) => {
-    const { ctx, powerGauge, width, height } = this;
+    const { ctx, powerGauge, canon, width, height } = this;
     ctx.clearRect(0, 0, this.width, this.height);
     powerGauge.process(time);
     ctx.drawImage(
@@ -112,6 +168,19 @@ class Navigation {
       width - powerGauge.width,
       (height - powerGauge.height) / 2
     );
+    ctx.save();
+    const canonX = width - powerGauge.width - canon.width - 10;
+    const canonY = height - canon.height * 1.5;
+    ctx.translate(canonX - canon.width / 2, canonY - canon.height / 2);
+    ctx.rotate(canon.angle * (Math.PI / 180));
+    ctx.drawImage(
+      canon.canvas,
+      -canon.width / 2,
+      -canon.height / 2,
+      canon.width,
+      canon.height
+    );
+    ctx.restore();
     window.requestAnimationFrame(this.render);
   };
 }
