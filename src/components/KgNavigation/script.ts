@@ -4,15 +4,19 @@ interface MenuItemInterface {
 }
 
 const MENU = {};
+const g = 9.80665;
 
 class Canon {
-  angle = 0;
-  maxAngle = 90;
-  minAngle = 0;
+  angle = 20;
+  maxAngle = 89;
+  minAngle = 1;
   canvas = document.createElement("canvas");
   ctx = this.canvas.getContext("2d")!;
   width = 50;
   height = 30;
+  inProgress = false;
+  direction = 0; // 1 = up , 0 = down;
+  prevTime = 0;
   constructor(ratio: number) {
     this.canvas.width = this.width * ratio;
     this.canvas.height = this.height * ratio;
@@ -20,14 +24,53 @@ class Canon {
     this.render();
   }
 
-  up = () => {
-    this.angle += 3;
+  startUp = () => {
+    this.inProgress = true;
+    this.direction = 1;
+  };
+
+  startDown = () => {
+    this.inProgress = true;
+    this.direction = 0;
+  };
+
+  endUp = () => {
+    if (this.direction === 1) {
+      this.inProgress = false;
+    }
+  };
+
+  endDown = () => {
+    if (this.direction === 0) {
+      this.inProgress = false;
+    }
+  };
+
+  private up = (timeDelta: number) => {
+    this.angle += timeDelta / 10;
     if (this.angle > this.maxAngle) this.angle = this.maxAngle;
   };
 
-  down = () => {
-    this.angle -= 3;
+  private down = (timeDelta: number) => {
+    this.angle -= timeDelta / 10;
     if (this.angle < this.minAngle) this.angle = this.minAngle;
+  };
+
+  process = (time: number) => {
+    if (!this.prevTime) {
+      this.prevTime = time;
+      return;
+    }
+
+    const timeDelta = time - this.prevTime;
+    if (this.inProgress) {
+      if (this.direction) {
+        this.up(timeDelta);
+      } else {
+        this.down(timeDelta);
+      }
+    }
+    this.prevTime = time;
   };
 
   render = () => {
@@ -43,6 +86,57 @@ class Canon {
     ctx.fill();
     ctx.strokeStyle = "#222222";
     ctx.stroke();
+  };
+}
+
+class Projectile {
+  r = 10;
+  width: number;
+  height: number;
+  color = "#eeeeee";
+  canvas = document.createElement("canvas");
+  ctx = this.canvas.getContext("2d")!;
+  xSpeed: number;
+  ySpeed: number;
+  g = g / 1000;
+  constructor(
+    ratio: number,
+    public x: number,
+    public y: number,
+    public v: number,
+    public theta: number
+  ) {
+    this.width = this.r * 2;
+    this.height = this.r * 2;
+    this.canvas.width = this.width * ratio;
+    this.canvas.height = this.height * ratio;
+    this.ctx.scale(ratio, ratio);
+    this.xSpeed = this.v * Math.cos((Math.PI / 180) * theta);
+    this.ySpeed = this.v * Math.sin((Math.PI / 180) * theta);
+    this.render();
+  }
+
+  render = () => {
+    const { ctx, r } = this;
+    ctx.beginPath();
+    ctx.arc(r, r, r, 0, 2 * Math.PI);
+    ctx.fill();
+  };
+
+  prevTime = 0;
+  process = (time: number) => {
+    const { prevTime, xSpeed, ySpeed } = this;
+    if (!prevTime) {
+      this.prevTime = time;
+      return;
+    }
+
+    const timeDelta = time - this.prevTime;
+    this.x -= xSpeed * timeDelta;
+    this.y -= (ySpeed - 0.5 * this.g) * timeDelta;
+    this.ySpeed -= this.g;
+
+    this.prevTime = time;
   };
 }
 
@@ -119,6 +213,7 @@ class Navigation {
   height: number;
   powerGauge = new PowerGauge();
   canon = new Canon(this.ratio);
+  ball?: Projectile;
   constructor() {
     this.canvas.style.width = "100%";
     this.canvas.style.height = "100%";
@@ -136,25 +231,38 @@ class Navigation {
       if (e.key === " ") {
         this.powerGauge.start();
       }
+      if (e.key === "w") {
+        this.canon.startUp();
+      }
+      if (e.key === "s") {
+        this.canon.startDown();
+      }
     });
-
-    window.addEventListener(
-      "keypress",
-      (e) => {
-        if (e.key === "w") {
-          this.canon.up();
-        }
-
-        if (e.key === "s") {
-          this.canon.down();
-        }
-      },
-      false
-    );
 
     window.addEventListener("keyup", (e) => {
       if (e.key === " ") {
+        const canonX =
+          this.width -
+          this.powerGauge.width -
+          this.canon.width -
+          10 -
+          this.canon.width / 2;
+        const canonY =
+          this.height - this.canon.height * 1.5 - this.canon.height / 2;
+        this.ball = new Projectile(
+          this.ratio,
+          canonX,
+          canonY,
+          this.powerGauge.power,
+          this.canon.angle
+        );
         this.powerGauge.end();
+      }
+      if (e.key === "w") {
+        this.canon.endUp();
+      }
+      if (e.key === "s") {
+        this.canon.endDown();
       }
     });
   }
@@ -163,15 +271,27 @@ class Navigation {
     const { ctx, powerGauge, canon, width, height } = this;
     ctx.clearRect(0, 0, this.width, this.height);
     powerGauge.process(time);
+    canon.process(time);
+    if (this.ball) {
+      this.ball.process(time);
+      ctx.drawImage(
+        this.ball.canvas,
+        this.ball.x - this.ball.r,
+        this.ball.y - this.ball.r,
+        this.ball.width,
+        this.ball.height
+      );
+    }
     ctx.drawImage(
       powerGauge.canvas,
       width - powerGauge.width,
       (height - powerGauge.height) / 2
     );
     ctx.save();
-    const canonX = width - powerGauge.width - canon.width - 10;
-    const canonY = height - canon.height * 1.5;
-    ctx.translate(canonX - canon.width / 2, canonY - canon.height / 2);
+    const canonX =
+      width - powerGauge.width - canon.width - 10 - canon.width / 2;
+    const canonY = height - canon.height * 1.5 - canon.height / 2;
+    ctx.translate(canonX, canonY);
     ctx.rotate(canon.angle * (Math.PI / 180));
     ctx.drawImage(
       canon.canvas,
