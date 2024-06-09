@@ -111,6 +111,7 @@ class Projectile {
     this.canvas.width = this.width * ratio;
     this.canvas.height = this.height * ratio;
     this.ctx.scale(ratio, ratio);
+    this.v = this.v;
     this.xSpeed = this.v * Math.cos((Math.PI / 180) * theta);
     this.ySpeed = this.v * Math.sin((Math.PI / 180) * theta);
     this.render();
@@ -231,10 +232,10 @@ class Navigation {
       if (e.key === " ") {
         this.powerGauge.start();
       }
-      if (e.key === "w") {
+      if (e.code === "KeyW") {
         this.canon.startUp();
       }
-      if (e.key === "s") {
+      if (e.code === "KeyS") {
         this.canon.startDown();
       }
     });
@@ -253,15 +254,17 @@ class Navigation {
           this.ratio,
           canonX,
           canonY,
-          this.powerGauge.power,
+          (this.powerGauge.power + 0.3) *
+            (Math.max(this.width, this.height) / 2000 + 1),
           this.canon.angle
         );
         this.powerGauge.end();
       }
-      if (e.key === "w") {
+
+      if (e.code === "KeyW") {
         this.canon.endUp();
       }
-      if (e.key === "s") {
+      if (e.code === "KeyS") {
         this.canon.endDown();
       }
     });
