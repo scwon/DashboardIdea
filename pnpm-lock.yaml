@@ -14,6 +14,9 @@ importers:
       astro:
         specifier: ^4.8.6
         version: 4.8.6(typescript@5.4.5)
+      three:
+        specifier: ^0.171.0
+        version: 0.171.0
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
@@ -1755,6 +1758,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  three@0.171.0:
+    resolution: {integrity: sha512-Y/lAXPaKZPcEdkKjh0JOAHVv8OOnv/NDJqm0wjfCzyQmfKxV7zvkwsnBgPBKTzJHToSOhRGQAGbPJObT59B/PQ==}
 
   to-fast-properties@2.0.0:
     resolution: {integrity: sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog==}
@@ -4050,6 +4056,8 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
+  three@0.171.0: {}
+
   to-fast-properties@2.0.0: {}
 
   to-regex-range@5.0.1:
@@ -4061,7 +4069,7 @@ snapshots:
   trough@2.2.0: {}
 
   tsconfck@3.0.3(typescript@5.4.5):
-    dependencies:
+    optionalDependencies:
       typescript: 5.4.5
 
   tslib@2.6.2:
@@ -4203,47 +4211,52 @@ snapshots:
       fsevents: 2.3.3
 
   vitefu@0.2.5(vite@5.2.11):
-    dependencies:
+    optionalDependencies:
       vite: 5.2.11
 
   volar-service-css@0.0.45(@volar/language-service@2.2.4):
     dependencies:
-      '@volar/language-service': 2.2.4
       vscode-css-languageservice: 6.2.14
       vscode-languageserver-textdocument: 1.0.11
       vscode-uri: 3.0.8
+    optionalDependencies:
+      '@volar/language-service': 2.2.4
 
   volar-service-emmet@0.0.45(@volar/language-service@2.2.4):
     dependencies:
       '@emmetio/css-parser': 0.4.0
       '@emmetio/html-matcher': 1.3.0
-      '@volar/language-service': 2.2.4
       '@vscode/emmet-helper': 2.9.3
+    optionalDependencies:
+      '@volar/language-service': 2.2.4
 
   volar-service-html@0.0.45(@volar/language-service@2.2.4):
     dependencies:
-      '@volar/language-service': 2.2.4
       vscode-html-languageservice: '@johnsoncodehk/vscode-html-languageservice@5.2.0-34a5462'
       vscode-languageserver-textdocument: 1.0.11
       vscode-uri: 3.0.8
+    optionalDependencies:
+      '@volar/language-service': 2.2.4
 
   volar-service-prettier@0.0.45(@volar/language-service@2.2.4):
     dependencies:
-      '@volar/language-service': 2.2.4
       vscode-uri: 3.0.8
+    optionalDependencies:
+      '@volar/language-service': 2.2.4
 
   volar-service-typescript-twoslash-queries@0.0.45(@volar/language-service@2.2.4):
-    dependencies:
+    optionalDependencies:
       '@volar/language-service': 2.2.4
 
   volar-service-typescript@0.0.45(@volar/language-service@2.2.4):
     dependencies:
-      '@volar/language-service': 2.2.4
       path-browserify: 1.0.1
       semver: 7.6.2
       typescript-auto-import-cache: 0.3.2
       vscode-languageserver-textdocument: 1.0.11
       vscode-nls: 5.2.0
+    optionalDependencies:
+      '@volar/language-service': 2.2.4
 
   vscode-css-languageservice@6.2.14:
     dependencies:

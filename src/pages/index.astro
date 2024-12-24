@@ -2,6 +2,7 @@
 import Footer from "../components/Footer.astro";
 import KgNavigation from "../components/KgNavigation/KgNavigation.astro";
 import Navigation from "../components/Navigation.astro";
+import Horse3D from "../components/Horse3D.astro";
 ---
 
 <html lang="ko-KR">
@@ -15,7 +16,23 @@ import Navigation from "../components/Navigation.astro";
   <body>
     <Navigation />
     <h1>SSP</h1>
+    
+    <div class="horse-container">
+      <Horse3D />
+    </div>
+    
     <KgNavigation />
     <Footer />
   </body>
 </html>
+
+<style>
+  .horse-container {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: -1;
+  }
+</style>
