@@ -4,7 +4,10 @@ interface MenuItemInterface {
 }
 
 const MENU = {};
-const g = 9.80665;
+const GRAVITY_CONST = 9.80665;
+
+let gValue: number = GRAVITY_CONST;
+gValue = gValue / 1000;
 
 class Canon {
   angle = 20;
@@ -98,7 +101,7 @@ class Projectile {
   ctx = this.canvas.getContext("2d")!;
   xSpeed: number;
   ySpeed: number;
-  g = g / 1000;
+  g = gValue;
   constructor(
     ratio: number,
     public x: number,
