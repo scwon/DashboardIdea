@@ -3,7 +3,7 @@
 
 <div id="horse-canvas"></div>
 
-<script>
+<script is:inline>
   import * as THREE from 'three';
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
@@ -32,7 +32,7 @@
 
   // 말 모델 로드
   const loader = new GLTFLoader();
-  let horse: THREE.Group | null = null;
+  let horse = null;
   
   loader.load(
     '/public/horse.glb', // 말 3D 모델 파일 경로
