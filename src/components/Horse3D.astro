@@ -4,20 +4,24 @@
 <div id="horse-canvas"></div>
 
 <script>
-  import * as THREE from '/node_modules/three/build/three.module.js';
-  import { GLTFLoader } from '/node_modules/three/examples/jsm/loaders/GLTFLoader.js';
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({
-    alpha: true,  // 투명 배경 활성화
-    antialias: true  // 부드러운 렌더링
+    alpha: true,
+    antialias: true
   });
   
   // 배경을 투명하게 설정
   renderer.setClearColor(0x000000, 0);
   
   const container = document.getElementById('horse-canvas');
+  if (!container) {
+    throw new Error('Canvas container not found');
+  }
+  
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
@@ -31,10 +35,10 @@
 
   // 말 모델 로드
   const loader = new GLTFLoader();
-  let horse = null;
+  let horse: THREE.Group | null = null;
   
   loader.load(
-    '/public/horse.glb', // 말 3D 모델 파일 경로
+    '/horse.glb', // public 폴더는 빌드 시 루트로 이동되므로 경로 수정
     function (gltf) {
       horse = gltf.scene;
       scene.add(horse);
@@ -70,12 +74,12 @@
 
 <style>
   #horse-canvas {
-    position: fixed; /* 고정 위치 */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* 다른 콘텐츠 뒤에 위치 */
+    z-index: -1;
     background: transparent;
   }
 </style>
